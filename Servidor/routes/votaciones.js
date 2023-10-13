@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const Votaciones = require("../models/votaciones");
+const { populate } = require("../models/users");
 
 router.get("/", (req, res) => {
   Votaciones.find()
@@ -19,6 +20,16 @@ router.get("/votaciones/:id", (req, res) => {
     .catch((err) => console.error(err));
 });
 
+// haz un metodo que devuelva las votaciones de un usuario si es que se encuentra en participantes
+router.get("/participante/:id", (req, res) => {
+
+    Votaciones.find({ idParticipantes: req.params.id })
+    .then((votaciones) => {
+        res.send({ votaciones });
+      })
+      .catch((err) => console.error(err));
+});
+
 router.post("/votaciones", (req, res) => {
   const votaciones = new Votaciones(req.body);
   votaciones
@@ -34,11 +45,11 @@ router.put("/votaciones/:id", (req, res) => {
     .then((votaciones) => {
       votaciones.idParticipantes = req.body.idParticipantes;
       votaciones.idCandidatos = req.body.idCandidatos;
-      votaciones.estado = req.body.estado; 
+      votaciones.estado = req.body.estado;
       return votaciones.save();
     })
     .then((votaciones) => {
-      res.send( { votaciones });
+      res.send({ votaciones });
     })
     .catch((err) => console.error(err));
 });
