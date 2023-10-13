@@ -8,6 +8,14 @@ var usersRouter = require('./routes/users');
 var app = express();
 var port = process.env.PORT || 3010; // Establece el puerto en 3000 o el valor de la variable de entorno PORT
 
+var mongoose = require('mongoose');
+
+mongoose.connect('mongodb+srv://proyecto:bTP5iARuLHXDPicZ@cluster0.lafxcfw.mongodb.net/appVotos', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -16,6 +24,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/votos', require('./routes/votos'));
+app.use('/votaciones', require('./routes/votaciones'));
 
 app.set('port', port); // Configura el puerto en la aplicación
 
