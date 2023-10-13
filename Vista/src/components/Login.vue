@@ -25,8 +25,6 @@
 </template>
 
 <script>
-import Papa from 'papaparse';
-
 export default {
   name: "LoginComponente",
   data() {
@@ -37,34 +35,7 @@ export default {
   },
   methods: {
     login() {
-      // Simulamos la lectura del archivo CSV (esto no es seguro en producción)
-      const file = '../BD/datosEjemplo';
       
-      Papa.parse(file, {
-        header: true,
-        dynamicTyping: true,
-        complete: (results) => {
-          const usuarios = results.data;
-          const usuario = usuarios.find(
-            (user) =>
-              user.correo === this.correo &&
-              user.clave === this.clave
-          );
-
-          if (usuario) {
-            // Redirige a diferentes menús según el tipo de usuario
-            if (usuario.tipo === 1) {
-              this.$router.push('/admin-menu');
-            } else if (usuario.tipo === 2) {
-              this.$router.push('/user-menu');
-            } else {
-              alert('Usuario no válido');
-            }
-          } else {
-            alert('Credenciales incorrectas');
-          }
-        },
-      });
     },
   },
 };
