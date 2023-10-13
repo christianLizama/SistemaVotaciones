@@ -1,10 +1,12 @@
 <template>
-  <div></div>
+  <div>
+    <p>Hola desde admin</p>
+  </div>
 </template>
 
 <script>
 export default {
-  name: "Test",
+  name: "AdminMenuComponente",
   created() {},
   data() {
     return {};

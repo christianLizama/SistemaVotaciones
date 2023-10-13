@@ -1,10 +1,12 @@
 <template>
-  <div></div>
+  <div>
+    <p>Hola desde UserMenu</p>
+  </div>
 </template>
 
 <script>
 export default {
-  name: "Test",
+  name: "UserMenuComponente",
   created() {},
   data() {
     return {};
