@@ -28,7 +28,11 @@ const routes = [
     name: 'userMenu',
     component: () => import('../views/UserMenuView.vue')
   },
-
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/HomeView.vue')
+  },
 ]
 
 const router = new VueRouter({
