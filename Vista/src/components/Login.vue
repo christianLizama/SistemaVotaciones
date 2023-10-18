@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: "LoginComponente",
   data() {
@@ -34,8 +36,30 @@ export default {
     };
   },
   methods: {
-    login() {
-      
+    async login() {
+      await axios.post('http://localhost:3030/users/login', {
+        email: this.correo,
+        password: this.clave,
+      }).then((response) => {
+        const user = response.data.userFind;
+        const userSave = {
+          nombre: user.nombre,
+          apellido: user.apellido,
+          correo: user.correo,
+          tipo: user.tipo,
+        }
+        //Guardar el usuario en el store
+        this.$store.dispatch("guardarUsuario", userSave);
+        //Verificar el tipo de usuario
+        if(userSave.tipo === 3){
+          this.$router.push('/adminMenu');
+        }
+        else{
+          this.$router.push('/userMenu');
+        }
+      }).catch((error) => {
+        console.log(error);
+      });  
     },
   },
 };

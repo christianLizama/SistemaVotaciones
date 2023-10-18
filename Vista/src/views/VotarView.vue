@@ -1,13 +1,12 @@
 <template>
   <div>
-    <p>Hola desde admin</p>
-    <p>Aqui vemos la lista de votaciones actuales</p>
+    <p>Aqui se debe votar</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: "AdminMenuComponente",
+  name: "VotarView",
   created() {},
   data() {
     return {};

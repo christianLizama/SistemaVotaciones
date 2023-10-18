@@ -1,13 +1,12 @@
 <template>
   <div>
-    <p>Hola desde admin</p>
-    <p>Aqui vemos la lista de votaciones actuales</p>
+    <p>Aquí se deberian detener las votaciones</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: "AdminMenuComponente",
+  name: "DetenerVotacionView",
   created() {},
   data() {
     return {};

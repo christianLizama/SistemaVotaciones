@@ -39,16 +39,19 @@ router.get("/alumnos", async(req, res) => {
 
 // Login
 router.post("/login", async(req, res) => {
-  const {user, password} = req.body;
-  await User.findOne({ email: user, password: password })
-    .then((user) => {
-      if (user) {
-        res.send({ user });
-      } else {
-        res.send({ message: "Usuario o contraseña incorrectos" });
-      }
-    })
-    .catch((err) => console.error(err));
+
+  try {
+    const {email, password} = req.body;
+    const userFind = await User.findOne({ correo: email, clave: password });
+    if(!userFind){
+      res.status(404).json({message: "Usuario no encontrado"});
+      return;
+    }
+    res.status(200).json({message: "Usuario encontrado", userFind});
+  } catch (error) {
+    console.log(error);  
+  }
+  
 });
 
 router.get("/", async(req, res) => {
