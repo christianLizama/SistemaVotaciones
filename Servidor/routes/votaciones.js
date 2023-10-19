@@ -4,15 +4,36 @@ const router = express.Router();
 const Votaciones = require("../models/votaciones");
 const { populate } = require("../models/users");
 
-router.get("/", (req, res) => {
+//obtener solo las votaciones de tipo 1 (alumnos)
+router.get("/getVotacionesAlumnos", async (req, res) => {
+  await Votaciones.find({ tipo: 1 , estado: true})
+    .then((votaciones) => {
+      res.send({ votaciones });
+    })
+    .catch((err) => console.error(err));
+});
+
+//obtener solo las votaciones de tipo 2 (profesores)
+router.get("/getVotacionesProfesores", async (req, res) => {
+  await Votaciones.find({ tipo: 2 , estado: true})
+    .then((votaciones) => {
+      res.send({ votaciones });
+    })
+    .catch((err) => console.error(err));
+});
+
+router.get("/getVotaciones", (req, res) => {
+  //obtener votaciones populando los participantes y candidatos
   Votaciones.find()
+    .populate("participantes")
+    .populate("candidatos")
     .then((votaciones) => {
       res.send({ votaciones });
     })
     .catch((err) => console.error(err));
 });
 
-router.get("/votaciones/:id", (req, res) => {
+router.get("/searchVotacion/:id", (req, res) => {
   Votaciones.findById(req.params.id)
     .then((votaciones) => {
       res.send({ votaciones });
@@ -20,41 +41,44 @@ router.get("/votaciones/:id", (req, res) => {
     .catch((err) => console.error(err));
 });
 
-// haz un metodo que devuelva las votaciones de un usuario si es que se encuentra en participantes
-router.get("/participante/:id", (req, res) => {
+router.post("/addVotacion", async (req, res) => {
+  try {
+    const newVotacion = new Votaciones(req.body);
+    await newVotacion.save();
 
-    Votaciones.find({ idParticipantes: req.params.id })
-    .then((votaciones) => {
-        res.send({ votaciones });
-      })
-      .catch((err) => console.error(err));
+    // Realiza la consulta para obtener la votación con participantes y candidatos populados
+    const votacionCreada = await Votaciones.findById(newVotacion._id)
+      .populate("participantes", "nombre") // Reemplaza "nombre" con los campos que desees mostrar
+      .populate("candidatos", "nombre") // Reemplaza "nombre" con los campos que desees mostrar
+      .exec();
+
+    console.log(votacionCreada);
+
+    res.send({ votacionCreada });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error al crear la votación");
+  }
 });
 
-router.post("/votaciones", (req, res) => {
-  const votaciones = new Votaciones(req.body);
-  votaciones
-    .save()
-    .then(() => {
-      res.send({ votaciones });
-    })
-    .catch((err) => console.error(err));
-});
-
-router.put("/votaciones/:id", (req, res) => {
+//Cambiar estado de la votación
+router.put("/updateVotacion/:id", (req, res) => {
+  const { estado, candidatos, participantes } = req.body;
   Votaciones.findById(req.params.id)
-    .then((votaciones) => {
-      votaciones.idParticipantes = req.body.idParticipantes;
-      votaciones.idCandidatos = req.body.idCandidatos;
-      votaciones.estado = req.body.estado;
-      return votaciones.save();
+    .then((votacion) => {
+      votacion.participantes = participantes;
+      votacion.candidatos = candidatos;
+      votacion.estado = estado;
+      const votacionActualizada = votacion.save();
+      return votacionActualizada;
     })
-    .then((votaciones) => {
-      res.send({ votaciones });
+    .then((votacionFinal) => {
+      res.send({ votacionFinal });
     })
     .catch((err) => console.error(err));
 });
 
-router.delete("/votaciones/:id", (req, res) => {
+router.delete("/deleteVotacion/:id", (req, res) => {
   Votaciones.findById(req.params.id)
     .then((votaciones) => {
       return votaciones.remove();

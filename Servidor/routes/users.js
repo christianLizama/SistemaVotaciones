@@ -19,26 +19,61 @@ const User = require("../models/users"); // Asegúrate de importar el modelo de 
 //     });
 // });
 
-router.get("/", (req, res) => {
-  User.find()
+// Obtener solo los usuarios que tengan el rol de 'admin'
+router.get("/getProfesores", async (req, res) => {
+  await User.find({ tipo: 2 })
+    .then((profesores) => {
+      res.send({ profesores });
+    })
+    .catch((err) => console.error(err));
+});
+
+// Obtener solo los usuarios que tengan el rol de 'user'
+router.get("/getAlumnos", async(req, res) => {
+  await User.find({ tipo: 1 })
+    .then((alumnos) => {
+      res.send({ alumnos });
+    })
+    .catch((err) => console.error(err));
+});
+
+// Login
+router.post("/login", async(req, res) => {
+
+  try {
+    const {email, password} = req.body;
+    const userFind = await User.findOne({ correo: email, clave: password });
+    if(!userFind){
+      res.status(404).json({message: "Usuario no encontrado"});
+      return;
+    }
+    res.status(200).json({message: "Usuario encontrado", userFind});
+  } catch (error) {
+    console.log(error);  
+  }
+  
+});
+
+router.get("/getUsers", async(req, res) => {
+  //Obtener solo usuarios con tipo 1 (alumnos) y 2 (profesores)
+  await User.find({ tipo: { $in: [1, 2] } })
     .then((users) => {
-      console.log(users);
       res.send({ users });
     })
     .catch((err) => console.error(err));
 });
 
-router.get("/:id", (req, res) => {
-  User.findById(req.params.id)
+router.get("/:id", async (req, res) => {
+  await User.findById(req.params.id)
     .then((users) => {
       res.send("users", { users });
     })
     .catch((err) => console.error(err));
 });
 
-router.post("/", (req, res) => {
+router.post("/postUser", async(req, res) => {
   const user = new User(req.body);
-  user
+  await user
     .save()
     .then(() => {
       res.send("users", { user });
@@ -46,8 +81,8 @@ router.post("/", (req, res) => {
     .catch((err) => console.error(err));
 });
 
-router.put("/:id", (req, res) => {
-  User.findById(req.params.id)
+router.put("/:id", async(req, res) => {
+  await User.findById(req.params.id)
     .then((user) => {
       user.nombre = req.body.nombre;
       user.apellido = req.body.apellido;
@@ -62,8 +97,8 @@ router.put("/:id", (req, res) => {
     .catch((err) => console.error(err));
 });
 
-router.delete("/:id", (req, res) => {
-  User.findById(req.params.id)
+router.delete("/:id", async(req, res) => {
+  await User.findById(req.params.id)
     .then((user) => {
       return user.remove();
     })

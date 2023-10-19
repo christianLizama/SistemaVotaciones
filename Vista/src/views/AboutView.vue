@@ -1,6 +1,16 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
-    
+  <div>
+    <navbar-admin />
   </div>
 </template>
+
+<script>
+import NavbarAdmin from '@/components/NavbarAdmin.vue'
+export default {
+  components: { NavbarAdmin },
+}
+</script>
+
+<style>
+
+</style>

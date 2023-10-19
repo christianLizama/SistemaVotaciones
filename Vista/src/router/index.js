@@ -28,6 +28,22 @@ const routes = [
     name: 'userMenu',
     component: () => import('../views/UserMenuView.vue')
   },
+  {
+    path: '/crearVotacion',
+    name: 'crearVotacion',
+    component: () => import('../views/CrearVotacionView.vue')
+  },
+  {
+    path: '/votar',
+    name: 'votar',
+    component: () => import('../views/VotarView.vue')
+  },
+  {
+    path: '/detenerVotacion',
+    name: 'detenerVotacion',
+    component: () => import('../views/DetenerVotacionView.vue')
+  }
+
 
 ]
 
