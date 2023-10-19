@@ -7,7 +7,7 @@
     <v-card v-for="(votacion, index) in votaciones" :key="votacion._id" class="mb-3">
       <v-card-title>Votación {{ index + 1 }}</v-card-title>
       <v-card-text>
-        <p>Estado: {{ votacion.estado ? 'Activo' : 'Inactivo' }}</p>
+        <p>Estado: {{ votacion.estado ? 'Activa' : 'Terminada' }}</p>
       </v-card-text>
       <v-card-actions>
         <v-btn @click="cambiarEstado(votacion)" color="primary">
@@ -52,7 +52,8 @@ export default {
         await axios.put(`http://localhost:3000/votaciones/updateVotacion/${votacion._id}`, {
           estado: votacion.estado,
           participantes: votacion.participantes,
-          candidatos: votacion.candidatos,
+          candidatosM: votacion.candidatosM,
+          candidatosF: votacion.candidatosF,
         }).then( () => {
           this.mostrarAlerta("success", "Estado cambiado con éxito.");
         })

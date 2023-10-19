@@ -21,20 +21,29 @@ const User = require("../models/users"); // Asegúrate de importar el modelo de 
 
 // Obtener solo los usuarios que tengan el rol de 'admin'
 router.get("/getProfesores", async (req, res) => {
-  await User.find({ tipo: 2 })
-    .then((profesores) => {
-      res.send({ profesores });
-    })
-    .catch((err) => console.error(err));
+  //obtener solo usuarios con tipo 2 (profesores) y genero femenino (F)
+  
+  try {
+    const profesoresF = await User.find({ tipo: 2, genero: "F" });
+    const profesoresM = await User.find({ tipo: 2, genero: "M" });
+    res.status(200).send({ profesoresF, profesoresM });
+  } catch (error) {
+    res.status(500).send({ error: "Error al obtener los profesores" });
+    console.log(error);
+  }
+
 });
 
 // Obtener solo los usuarios que tengan el rol de 'user'
 router.get("/getAlumnos", async(req, res) => {
-  await User.find({ tipo: 1 })
-    .then((alumnos) => {
-      res.send({ alumnos });
-    })
-    .catch((err) => console.error(err));
+  try {
+    const AlumnosF = await User.find({ tipo: 1, genero: "F" });
+    const AlumnosM = await User.find({ tipo: 1, genero: "M" });
+    res.status(200).send({ AlumnosF, AlumnosM });
+  } catch (error) {
+    res.status(500).send({ error: "Error al obtener los alumnos" });
+    console.log(error);
+  }
 });
 
 // Login

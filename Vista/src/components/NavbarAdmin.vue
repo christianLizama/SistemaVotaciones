@@ -26,6 +26,11 @@
             <v-list-item-title>Detener Votaciones</v-list-item-title>
           </v-list-item>
 
+          <v-list-item to="/resultadosVotaciones">
+            <v-list-item-icon><v-icon>mdi-folder</v-icon></v-list-item-icon>
+            <v-list-item-title>Ver resultados</v-list-item-title>
+          </v-list-item>
+
           <v-list-item @click="cerrarSesion">
             <v-list-item-icon><v-icon>mdi-logout</v-icon></v-list-item-icon>
             <v-list-item-title>Cerrar Sesión</v-list-item-title>

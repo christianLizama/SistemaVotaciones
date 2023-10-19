@@ -43,6 +43,7 @@ export default {
       }).then((response) => {
         const user = response.data.userFind;
         const userSave = {
+          _id: user._id,
           nombre: user.nombre,
           apellido: user.apellido,
           correo: user.correo,
@@ -52,10 +53,10 @@ export default {
         this.$store.dispatch("guardarUsuario", userSave);
         //Verificar el tipo de usuario
         if(userSave.tipo === 3){
-          this.$router.push('/adminMenu');
+          this.$router.push('/crearVotacion');
         }
         else{
-          this.$router.push('/userMenu');
+          this.$router.push('/votar');
         }
       }).catch((error) => {
         console.log(error);
