@@ -13,13 +13,18 @@
     >
       <v-card-title> Votación {{ index + 1 }} </v-card-title>
       <v-card-text>
-        <p>Candidatos:</p>
+        <h3>Candidatos:</h3>
         <ul>
-          <li v-for="candidato in votacion.candidatos" :key="candidato._id">
-            {{ candidato.nombre }}
+          <h4>Hombres:</h4>
+          <li v-for="hombre in votacion.candidatosM" :key="hombre.candidatoId._id">
+            {{ hombre.candidatoId.nombre }}
+          </li>
+          <h4>Mujeres:</h4>
+          <li v-for="mujer in votacion.candidatosF" :key="mujer.candidatoId._id">
+            {{ mujer.candidatoId.nombre }}
           </li>
         </ul>
-        <p>Participantes:</p>
+        <h3>Participantes:</h3>
         <ul>
           <li
             v-for="participante in votacion.participantes"
@@ -28,9 +33,12 @@
             {{ participante.nombre }}
           </li>
         </ul>
-        <p>Estado: {{ votacion.estado ? "Activo" : "Inactivo" }}</p>
-        <p>Tipo de votación: {{ votacion.tipo === 1 ? "Alumno" : "Profesor" }}</p>
-
+        <h3>Estado: </h3>
+        <li>{{ votacion.estado ? "Activo" : "Inactivo" }}</li>
+        <h3>
+          Tipo de votación: 
+        </h3>
+        <li>{{ votacion.tipo === 1 ? "Alumno" : "Profesor" }}</li>
       </v-card-text>
     </v-card>
 
@@ -58,18 +66,18 @@
         <v-card-text>
           <v-select
             v-if="tipoUsuarioSeleccionado === 'alumno'"
-            v-model="candidatosSeleccionados"
-            :items="alumnos"
-            label="Candidatos"
+            v-model="candidatosSeleccionadosM"
+            :items="alumnosM"
+            label="Candidatos Masculinos"
             item-text="nombre"
             multiple
             return-object
           ></v-select>
           <v-select
-            v-else
-            v-model="candidatosSeleccionados"
-            :items="profesores"
-            label="Candidatos"
+            v-if="tipoUsuarioSeleccionado === 'alumno'"
+            v-model="candidatosSeleccionadosF"
+            :items="alumnosF"
+            label="Candidatos Femeninos"
             item-text="nombre"
             multiple
             return-object
@@ -77,17 +85,35 @@
           <v-select
             v-if="tipoUsuarioSeleccionado === 'alumno'"
             v-model="participantesSeleccionados"
-            :items="alumnos"
-            label="Participantes"
+            :items="todosAlumnos"
+            label="Alumnos participantes"
             item-text="nombre"
             multiple
             return-object
           ></v-select>
           <v-select
-            v-else
+            v-if="tipoUsuarioSeleccionado === 'profesor'"
+            v-model="candidatosSeleccionadosM"
+            :items="profesoresM"
+            label="Candidatos Masculinos"
+            item-text="nombre"
+            multiple
+            return-object
+          ></v-select>
+          <v-select
+            v-if="tipoUsuarioSeleccionado === 'profesor'"
+            v-model="candidatosSeleccionadosF"
+            :items="profesoresF"
+            label="Candidatos Femeninos"
+            item-text="nombre"
+            multiple
+            return-object
+          ></v-select>
+          <v-select
+            v-if="tipoUsuarioSeleccionado === 'profesor'"
             v-model="participantesSeleccionados"
-            :items="profesores"
-            label="Participantes"
+            :items="todosProfesores"
+            label="Profesores participantes"
             item-text="nombre"
             multiple
             return-object
@@ -117,19 +143,24 @@ export default {
       tipoUsuarioSeleccionado: "alumno",
       dialogVisible: false,
       participantesSeleccionados: [],
-      candidatosSeleccionados: [],
-      alumnos: [],
-      profesores: [],
+      candidatosSeleccionadosM: [],
+      candidatosSeleccionadosF: [],
+      alumnosM: [],
+      alumnosF: [],
+      todosAlumnos: [],
+      profesoresM: [],
+      profesoresF: [],
+      todosProfesores: [],
     };
   },
-  props: {},
   methods: {
     async obtenerVotaciones() {
       try {
         const response = await axios.get(
-          "http://localhost:3000/votaciones/getVotaciones"
+          "http://localhost:3030/votaciones/getVotaciones"
         );
         this.votaciones = response.data.votaciones;
+        console.log(response.data.votaciones);
       } catch (error) {
         console.error(error);
       }
@@ -141,7 +172,8 @@ export default {
       this.tipoUsuarioDialogVisible = false;
       //limpiar los arreglos de participantes y candidatos
       this.participantesSeleccionados = [];
-      this.candidatosSeleccionados = [];
+      this.candidatosSeleccionadosM = [];
+      this.candidatosSeleccionadosF = [];
     },
     cargarUsuarios() {
       // Llama a los métodos para obtener la lista de alumnos y profesores
@@ -156,9 +188,12 @@ export default {
     async obtenerAlumnos() {
       try {
         const response = await axios.get(
-          "http://localhost:3000/users/getAlumnos"
+          "http://localhost:3030/users/getAlumnos"
         );
-        this.alumnos = response.data.alumnos;
+        console.log(response.data);
+        this.alumnosM = response.data.AlumnosM;
+        this.alumnosF = response.data.AlumnosF;
+        this.todosAlumnos = this.alumnosM.concat(this.alumnosF);
       } catch (error) {
         console.error(error);
       }
@@ -166,35 +201,60 @@ export default {
     async obtenerProfesores() {
       try {
         const response = await axios.get(
-          "http://localhost:3000/users/getProfesores"
+          "http://localhost:3030/users/getProfesores"
         );
-        this.profesores = response.data.profesores;
+        this.profesoresM = response.data.profesoresM;
+        this.profesoresF = response.data.profesoresF;
+        this.todosProfesores = this.profesoresM.concat(this.profesoresF);
       } catch (error) {
         console.error(error);
       }
     },
     guardarVotacion() {
-      //verificar que se hayan seleccionado participantes y candidatos
+      // Verificar que se hayan seleccionado participantes y candidatos
       if (
         this.participantesSeleccionados.length === 0 ||
-        this.candidatosSeleccionados.length === 0
+        (this.candidatosSeleccionadosM.length === 0 &&
+          this.candidatosSeleccionadosF.length === 0)
       ) {
         alert("No se han seleccionado participantes o candidatos");
         return;
       }
-      //verificar que los candidatos si estén dentro de los participantes
+
+      // Crear un arreglo de todos los candidatos
+      const candidatosMIds = this.candidatosSeleccionadosM.map(
+        (candidato) => candidato._id
+      );
+      const candidatosFIds = this.candidatosSeleccionadosF.map(
+        (candidato) => candidato._id
+      );
+
+      // Crear un arreglo de todos los participantes
       const participantesIds = this.participantesSeleccionados.map(
         (participante) => participante._id
       );
-      const candidatosIds = this.candidatosSeleccionados.map(
-        (candidato) => candidato._id
-      );
-      const candidatosNoParticipantes = candidatosIds.filter(
+
+      // Verificar que todos los candidatos masculinos estén dentro de los participantes
+      const candidatosMNoParticipantes = candidatosMIds.filter(
         (candidatoId) => !participantesIds.includes(candidatoId)
       );
 
-      if (candidatosNoParticipantes.length > 0) {
-        alert("No todos los candidatos están dentro de los participantes");
+      // Verificar que todos los candidatos femeninos estén dentro de los participantes
+      const candidatosFNoParticipantes = candidatosFIds.filter(
+        (candidatoId) => !participantesIds.includes(candidatoId)
+      );
+
+      if (candidatosMNoParticipantes.length > 0) {
+        alert(
+          "Algunos candidatos masculinos no están dentro de los participantes"
+        );
+        return;
+      }
+
+      if (candidatosFNoParticipantes.length > 0) {
+        alert(
+          "Algunos candidatos femeninos no están dentro de los participantes"
+        );
         return;
       }
 
@@ -203,20 +263,37 @@ export default {
       if (this.tipoUsuarioSeleccionado === "alumno") {
         tipoVotacion = 1;
       }
+      let candidatosFinalesM = [];
+      let candidatosFinalesF = [];
+      
+      this.candidatosSeleccionadosM.forEach(candidatosM => {
+        const candidato = {
+          candidatoId: candidatosM._id,
+          votos: 0,
+        }
+        candidatosFinalesM.push(candidato);
+      });
+
+      this.candidatosSeleccionadosF.forEach(candidatosF => {
+        const candidato = {
+          candidatoId: candidatosF._id,
+          votos: 0,
+        }
+        candidatosFinalesF.push(candidato);
+      });
 
       // Crea una nueva votación con los IDs de los participantes y candidatos
       const votacion = {
         participantes: this.participantesSeleccionados.map(
           (participante) => participante._id
         ),
-        candidatos: this.candidatosSeleccionados.map(
-          (candidato) => candidato._id
-        ),
+        candidatosM: candidatosFinalesM,
+        candidatosF: candidatosFinalesF,
         estado: true,
         tipo: tipoVotacion,
       };
       axios
-        .post("http://localhost:3000/votaciones/addVotacion", votacion)
+        .post("http://localhost:3030/votaciones/addVotacion", votacion)
         .then((response) => {
           // Agrega la votación a la lista de votaciones
           this.votaciones.push(response.data.votacionCreada);
@@ -231,7 +308,8 @@ export default {
       this.dialogVisible = false;
       //limpiar los arreglos de participantes y candidatos
       this.participantesSeleccionados = [];
-      this.candidatosSeleccionados = [];
+      this.candidatosSeleccionadosM = [];
+      this.candidatosSeleccionadosF = [];
     },
   },
 };

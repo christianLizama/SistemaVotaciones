@@ -42,6 +42,11 @@ const routes = [
     path: '/detenerVotacion',
     name: 'detenerVotacion',
     component: () => import('../views/DetenerVotacionView.vue')
+  },
+  {
+    path: '/resultadosVotaciones',
+    name: 'resultadosVotaciones',
+    component: () => import('../views/VerResultadosView.vue')
   }
 
 
