@@ -20,41 +20,44 @@ const User = require("../models/users"); // Asegúrate de importar el modelo de 
 // });
 
 // Obtener solo los usuarios que tengan el rol de 'admin'
-router.get("/profesores", async (req, res) => {
+router.get("/getProfesores", async (req, res) => {
   await User.find({ tipo: 2 })
-    .then((users) => {
-      res.send({ users });
+    .then((profesores) => {
+      res.send({ profesores });
     })
     .catch((err) => console.error(err));
 });
 
 // Obtener solo los usuarios que tengan el rol de 'user'
-router.get("/alumnos", async(req, res) => {
+router.get("/getAlumnos", async(req, res) => {
   await User.find({ tipo: 1 })
-    .then((users) => {
-      res.send({ users });
+    .then((alumnos) => {
+      res.send({ alumnos });
     })
     .catch((err) => console.error(err));
 });
 
 // Login
 router.post("/login", async(req, res) => {
-  const {user, password} = req.body;
-  await User.findOne({ email: user, password: password })
-    .then((user) => {
-      if (user) {
-        res.send({ user });
-      } else {
-        res.send({ message: "Usuario o contraseña incorrectos" });
-      }
-    })
-    .catch((err) => console.error(err));
+
+  try {
+    const {email, password} = req.body;
+    const userFind = await User.findOne({ correo: email, clave: password });
+    if(!userFind){
+      res.status(404).json({message: "Usuario no encontrado"});
+      return;
+    }
+    res.status(200).json({message: "Usuario encontrado", userFind});
+  } catch (error) {
+    console.log(error);  
+  }
+  
 });
 
-router.get("/", async(req, res) => {
-  await User.find()
+router.get("/getUsers", async(req, res) => {
+  //Obtener solo usuarios con tipo 1 (alumnos) y 2 (profesores)
+  await User.find({ tipo: { $in: [1, 2] } })
     .then((users) => {
-      console.log(users);
       res.send({ users });
     })
     .catch((err) => console.error(err));

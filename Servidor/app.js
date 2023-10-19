@@ -4,16 +4,20 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var cors = require('cors');
+
 
 var app = express();
-var port = process.env.PORT || 3010; // Establece el puerto en 3000 o el valor de la variable de entorno PORT
+var port = process.env.PORT || 3030; // Establece el puerto en 3000 o el valor de la variable de entorno PORT
+
+app.use(cors()); // Habilita CORS para todas las rutas
 
 var mongoose = require('mongoose');
 
 mongoose.connect('mongodb+srv://proyecto:bTP5iARuLHXDPicZ@cluster0.lafxcfw.mongodb.net/appVotos', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
+}).then(() => console.log('Conexión a MongoDB exitosa'));
 
 
 app.use(logger('dev'));
